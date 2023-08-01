@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtmcsakggn1yb"]
+
+[ext_resource type="Texture2D" uid="uid://ciu70rb20iyny" path="res://assets/sprites/hero01.png" id="1_lum3g"]
+
+[node name="HeroKnight" type="Sprite2D"]
+texture = ExtResource("1_lum3g")
