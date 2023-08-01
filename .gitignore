@@ -1,0 +1,19 @@
+# Misc
+.DS_Store
+logs/
+
+# The default cache directory
+cache/
+
+# Godot auto generated files
+*.gen.*
+.import/
+.godot/
+/gen/
+
+# Visual Studio Code workspace file
+*.code-workspace
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
