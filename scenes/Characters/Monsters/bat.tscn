@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvw3rewx8n6fr"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_85qj2"]
+[ext_resource type="Texture2D" uid="uid://mg1i5jnnypin" path="res://assets/sprites/Monster01.png" id="2_ex5yy"]
+
+[node name="bat" instance=ExtResource("1_85qj2")]
+texture = ExtResource("2_ex5yy")
+attack = 2.0

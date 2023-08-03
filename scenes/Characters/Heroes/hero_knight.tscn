@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtmcsakggn1yb"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_30yyl"]
+
+[node name="hero_knight" instance=ExtResource("1_30yyl")]
+max_health = 30.0
+attack = 1.0

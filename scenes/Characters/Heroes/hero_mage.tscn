@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://00iuyk4as8rv"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_hl6lv"]
+[ext_resource type="Texture2D" uid="uid://b1743b2faj2hd" path="res://assets/sprites/hero02.png" id="2_cu8vl"]
+
+[node name="hero_mage" instance=ExtResource("1_hl6lv")]
+texture = ExtResource("2_cu8vl")
+max_health = 15.0

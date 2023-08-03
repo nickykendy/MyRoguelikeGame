@@ -4,6 +4,7 @@ extends Node2D
 
 var astar :AStarGrid2D
 var monsters :Array
+var alert_monsters :Array
 var heroes :Array
 var map :Dictionary = {}
 var fov_map :MRPAS
@@ -13,7 +14,7 @@ func _ready():
 	_generate_map()
 	
 	astar = AStarGrid2D.new()
-	astar.diagonal_mode = 1
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.region = Rect2i(0, 0, Game.level_size.x, Game.level_size.y)
 	astar.cell_size = Vector2(Game.TILESIZE, Game.TILESIZE)
 	astar.update()
@@ -37,8 +38,14 @@ func _ready():
 
 
 func _on_Hero_moved() -> void:
-	for mon in monsters:
-		mon.act(astar, monsters)
+	if heroes.is_empty(): return
+	
+	await get_tree().create_timer(0.2).timeout
+	if !monsters.is_empty():
+		for mon in monsters:
+			mon.act(astar, monsters)
+	
+	heroes[0].is_hero_turn = true
 
 
 func _on_Hero_try_move(coord:Vector2i, tileType:Vector2i) -> void:
@@ -81,12 +88,12 @@ func _compute_field_of_view() -> void:
 	
 	for pos in map:
 		if fov_map.is_in_view(pos):
-			map[pos].is_visible = true
+			map[pos].is_in_view = true
 			map[pos].is_explored = true
 		else:
-			map[pos].is_visible = false
+			map[pos].is_in_view = false
 		
-		update_fog(pos, map[pos].is_visible, map[pos].is_explored)
+		update_fog(pos, map[pos].is_in_view, map[pos].is_explored)
 
 
 func _update_monsters_visibility() -> void:
@@ -94,14 +101,14 @@ func _update_monsters_visibility() -> void:
 	
 	for mon in monsters:
 		var pos = mon.current_tile
-		if !map[pos].is_visible:
+		if !map[pos].is_in_view:
 			mon.visible = false
 		else:
 			mon.visible = true
 
 
-func update_fog(pos:Vector2i, is_visible:bool, is_explored) -> void:
-	if is_visible:
+func update_fog(pos:Vector2i, is_in_view:bool, is_explored) -> void:
+	if is_in_view:
 		tile_map.set_cell(1, pos, 0, Game.TILE_NONE)
 	elif is_explored:
 		tile_map.set_cell(1, pos, 0, Game.TILE_FOG)

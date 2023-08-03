@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://c3rrxdh7ryw5v"]
+
+[ext_resource type="Texture2D" uid="uid://ciu70rb20iyny" path="res://assets/sprites/hero01.png" id="1_icvwg"]
+[ext_resource type="Script" path="res://scripts/Unit.gd" id="2_td4au"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gw4sn"]
+size = Vector2(16, 16)
+
+[node name="Unit" type="Sprite2D"]
+texture = ExtResource("1_icvwg")
+script = ExtResource("2_td4au")
+
+[node name="HP" type="ColorRect" parent="."]
+offset_left = -8.0
+offset_top = -10.0
+offset_right = 8.0
+offset_bottom = -8.0
+color = Color(1, 0, 0, 1)
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_gw4sn")

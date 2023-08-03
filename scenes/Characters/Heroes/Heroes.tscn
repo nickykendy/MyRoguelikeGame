@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://e377k2m2ijhw"]
+
+[ext_resource type="Script" path="res://scripts/Heroes.gd" id="1_as48d"]
+
+[node name="Heroes" type="Node2D" groups=["heroes"]]
+script = ExtResource("1_as48d")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(16, 16)
+
+[node name="Slots" type="Node" parent="."]
+
+[node name="slot_0" type="Node2D" parent="Slots"]
+position = Vector2(16, 16)
+
+[node name="slot_1" type="Node2D" parent="Slots"]
+position = Vector2(8, 16)
+
+[node name="slot_2" type="Node2D" parent="Slots"]
+position = Vector2(24, 16)
+
+[node name="slot_3" type="Node2D" parent="Slots"]
+position = Vector2(8, 8)
+
+[node name="slot_4" type="Node2D" parent="Slots"]
+position = Vector2(24, 8)
+
+[node name="slot_5" type="Node2D" parent="Slots"]
+position = Vector2(8, 24)
+
+[node name="slot_6" type="Node2D" parent="Slots"]
+position = Vector2(24, 24)
