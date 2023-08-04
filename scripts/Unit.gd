@@ -4,9 +4,13 @@ class_name Unit
 
 var dead := false
 var cur_health :float: set = set_cur_health
+var is_front := true
 
 @export var max_health :float = 10.0
 @export var attack :float = 3.0
+
+signal mou_entered
+signal mou_exited
 
 
 func _ready():
@@ -27,8 +31,8 @@ func set_cur_health(value):
 
 
 func _on_area_2d_mouse_entered():
-	self_modulate = Color(0.0, 1.0, 0.0, 1.0)
+	mou_entered.emit(self)
 
 
 func _on_area_2d_mouse_exited():
-	self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	mou_exited.emit(self)

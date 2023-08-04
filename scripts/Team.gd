@@ -22,9 +22,19 @@ func set_team(new_team):
 			call_deferred("add_member_into_slots", new_member)
 
 
-func add_member_into_slots(_member):
+func add_member_into_slots(_member:Unit) -> void:
 	add_child(_member)
+	_member.mou_entered.connect(_on_Unit_mou_entered)
+	_member.mou_exited.connect(_on_Unit_mou_exited)
 	update_team_formation()
+
+
+func _on_Unit_mou_entered(_unit):
+	_unit.self_modulate = Color(0.0, 1.0, 0.0, 1.0)
+
+
+func _on_Unit_mou_exited(_unit):
+	_unit.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 
 func update_team_formation():
@@ -44,14 +54,40 @@ func update_team_formation():
 		4:
 			slots[0].position = Vector2(8, 8)
 			slots[1].position = Vector2(24, 8)
-			slots[2].position = Vector2(8, 24)
-			slots[3].position = Vector2(24, 24)
+			slots[2].position = Vector2(24, 24)
+			slots[3].position = Vector2(8, 24)
 
 
 func pos_to_map(_pos:Vector2) -> Vector2i:
 	var _x = _pos.x / Game.TILESIZE
 	var _y = _pos.y / Game.TILESIZE
 	return Vector2i(_x, _y)
+
+
+func map_to_pos(_map:Vector2i) -> Vector2:
+	var _x = _map.x * Game.TILESIZE
+	var _y = _map.y * Game.TILESIZE
+	return Vector2(_x, _y)
+
+
+func global_to_local_pos(_pos:Vector2) -> Vector2:
+	var _map_pos = pos_to_map(_pos)
+	var _x = _pos.x - _map_pos.x * Game.TILESIZE
+	var _y = _pos.y - _map_pos.y * Game.TILESIZE
+	return Vector2(_x, _y)
+
+
+func get_member_by_pos(_pos:Vector2) -> Unit:
+	if slots.is_empty(): return
+	
+	var member_pos = global_to_local_pos(_pos)
+	var member :Unit
+	for slot in slots:
+		if member_pos.x > slot.position.x - 8 and member_pos.x < slot.position.x + 8 and member_pos.y > slot.position.y - 8 and member_pos.y < slot.position.y + 8:
+			member = slot
+			break
+	
+	return member
 
 
 func get_tile_center(tile_x:int, tile_y:int) -> Vector2:
