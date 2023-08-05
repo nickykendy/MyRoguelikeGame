@@ -1,6 +1,7 @@
 extends Node2D
 
 @onready var tile_map := $TileMap
+@onready var text_panel := $CanvasLayer/UI/VBoxContainer/TextEdit
 
 var astar :AStarGrid2D
 var monsters :Array
@@ -8,6 +9,7 @@ var alert_monsters :Array
 var heroes :Array
 var map :Dictionary = {}
 var fov_map :MRPAS
+var battle_log :String
 
 
 func _ready():
@@ -27,10 +29,16 @@ func _ready():
 	
 	monsters = get_tree().get_nodes_in_group("monsters")
 	heroes = get_tree().get_nodes_in_group("heroes")
+	var all_characters := monsters.duplicate()
+	all_characters.append_array(heroes.duplicate())
 	
-	if heroes.is_empty(): return
-	heroes[0].moved.connect(_on_Hero_moved)
-	heroes[0].try_move.connect(_on_Hero_try_move)
+	if !heroes.is_empty():
+		heroes[0].moved.connect(_on_Hero_moved)
+		heroes[0].try_move.connect(_on_Hero_try_move)
+	
+	if !all_characters.is_empty():
+		for _char in all_characters:
+			_char.dmg_taken.connect(_on_Team_dmg_taken)
 	
 	_populate_mrpas()
 	_compute_field_of_view()
@@ -59,6 +67,15 @@ func _on_Hero_try_move(coord:Vector2i, tileType:Vector2i) -> void:
 		
 	_compute_field_of_view()
 	_update_monsters_visibility()
+
+
+func _on_Team_dmg_taken(attacker:Unit, victim:Unit, dmg:float) -> void:
+	if battle_log:
+		battle_log = battle_log + "\n" + attacker.name + " attacks " + victim.name + " with " + str(dmg)
+	else:
+		battle_log = attacker.name + " attacks " + victim.name + " with " + str(dmg)
+	
+	text_panel.text = battle_log
 
 
 func _generate_map() -> void:

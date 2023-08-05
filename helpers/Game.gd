@@ -23,3 +23,4 @@ var UNITS :Dictionary = {
 
 func _ready():
 	DisplayServer.window_set_size(Vector2(1920, 1080), 0)
+	randomize()

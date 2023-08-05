@@ -39,7 +39,8 @@ func _input(event):
 
 
 func _rotate_formation(is_clockwise:bool) -> void:
-	if slots.is_empty(): return
+	if members.is_empty(): return
+	if slots.is_empty():return
 	
 	var temp_slots = slots.duplicate()
 	var tween = create_tween()
@@ -55,7 +56,6 @@ func _rotate_formation(is_clockwise:bool) -> void:
 			tween.tween_property(slots[i], "position", slots[next].position, 0.2)
 			temp_slots[next] = slots[i]
 	
-	slots.clear()
 	slots = temp_slots.duplicate()
 	temp_slots.clear()
 
@@ -87,10 +87,21 @@ func heroes_act(dx:int, dy:int) -> void:
 		var blocked = false
 		if !world.monsters.is_empty():
 			for mon in world.monsters:
-				if mon.current_tile.x == _x && mon.current_tile.y == _y:
-					for hero in slots:
-						var dmg = hero.attack
-						mon.receive_damage(dmg)
+				if mon.current_tile == dest:
+					var attackers :Array
+					var from_pos = dest - current_tile
+					var attack_slot := get_adjacent_slot_from_attack_dir(from_pos)
+					
+					for i in slots.size():
+						if slots[i]:
+							if !slots[i].is_melee:
+								attackers.append(slots[i])
+							elif slots[i].is_melee and (i == attack_slot.x or i == attack_slot.y):
+								attackers.append(slots[i])
+						
+					for attacker in attackers:
+						mon.receive_damage(attacker, current_tile)
+					
 					if mon.dead:
 						world.monsters.erase(mon)
 					blocked = true
@@ -109,10 +120,10 @@ func heroes_act(dx:int, dy:int) -> void:
 	is_hero_turn = false
 
 
-func _process(delta):
+func _process(_delta):
 	if slots.is_empty(): return
 	
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	if Input.is_action_pressed("mouse left"):
 		if !picked:
 			var mouse_pos = get_global_mouse_position()
 			var _hero = get_member_by_pos(mouse_pos)
@@ -130,7 +141,6 @@ func _process(delta):
 				var temp_slots = slots.duplicate()
 				temp_slots[origin_index] = slots[switch_index]
 				temp_slots[switch_index] = slots[origin_index]
-				slots.clear()
 				slots = temp_slots.duplicate()
 				temp_slots.clear()
 		picked = null

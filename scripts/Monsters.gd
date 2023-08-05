@@ -20,9 +20,20 @@ func act(pathfinding, monsters):
 		var dest := Vector2i(path[1].x, path[1].y)
 		
 		if dest == player_ref.current_tile:
-			for mon in slots:
-				var dmg = mon.attack
-				player_ref.receive_damage(dmg)
+			var attackers :Array
+			var from_pos = dest - current_tile
+			var attack_slot := get_adjacent_slot_from_attack_dir(from_pos)
+			
+			for i in slots.size():
+				if slots[i] != null:
+					if !slots[i].is_melee:
+						attackers.append(slots[i])
+					elif slots[i].is_melee and (i == attack_slot.x or i == attack_slot.y):
+						attackers.append(slots[i])
+				
+			for attacker in attackers:
+				player_ref.receive_damage(attacker, current_tile)
+			
 		else:
 			var blocked = false
 			for mon in monsters:

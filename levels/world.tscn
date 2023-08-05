@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://csm8hr4yp7psj"]
+[gd_scene load_steps=6 format=3 uid="uid://csm8hr4yp7psj"]
 
 [ext_resource type="TileSet" uid="uid://cywpxt7comtpf" path="res://assets/tiles/DungeonTiles.tres" id="1_4n76x"]
 [ext_resource type="Script" path="res://scripts/GameWorld.gd" id="1_mt4a4"]
 [ext_resource type="PackedScene" uid="uid://e377k2m2ijhw" path="res://scenes/Characters/Heroes/Heroes.tscn" id="2_n7xmj"]
 [ext_resource type="PackedScene" uid="uid://7nrqcqrfvx63" path="res://scenes/Characters/Monsters/Monsters.tscn" id="3_hq5bu"]
+[ext_resource type="Script" path="res://scripts/UI.gd" id="5_wldhq"]
 
 [node name="world" type="Node2D"]
 script = ExtResource("1_mt4a4")
@@ -40,3 +41,43 @@ team = ["mon bat"]
 [node name="Monsters4" parent="." instance=ExtResource("3_hq5bu")]
 position = Vector2(480, 448)
 team = ["mon bat", "mon bat", "mon bat", "mon bat"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -400.0
+offset_right = 640.0
+grow_vertical = 0
+script = ExtResource("5_wldhq")
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -120.0
+offset_right = 200.0
+grow_vertical = 0
+color = Color(0.431373, 0.431373, 0.67451, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -120.0
+offset_right = 200.0
+grow_vertical = 0
+
+[node name="TextEdit" type="TextEdit" parent="CanvasLayer/UI/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 10
+text = "
+"
+scroll_smooth = true
+scroll_past_end_of_file = true

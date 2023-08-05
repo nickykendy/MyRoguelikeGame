@@ -4,8 +4,9 @@ class_name Unit
 
 var dead := false
 var cur_health :float: set = set_cur_health
-var is_front := true
+var unit_name :String
 
+@export var is_melee :bool = true
 @export var max_health :float = 10.0
 @export var attack :float = 3.0
 

@@ -5,4 +5,5 @@
 
 [node name="hero_mage" instance=ExtResource("1_hl6lv")]
 texture = ExtResource("2_cu8vl")
+is_melee = false
 max_health = 15.0
