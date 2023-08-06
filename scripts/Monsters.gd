@@ -20,7 +20,7 @@ func act(pathfinding, monsters):
 		var dest := Vector2i(path[1].x, path[1].y)
 		
 		if dest == player_ref.current_tile:
-			var attackers :Array
+			var attackers :Array = []
 			var from_pos = dest - current_tile
 			var attack_slot := get_adjacent_slot_from_attack_dir(from_pos)
 			

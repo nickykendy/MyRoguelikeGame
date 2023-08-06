@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://b21efxbnacuyv"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_0wunp"]
+[ext_resource type="Texture2D" uid="uid://vc82ujyotdns" path="res://assets/sprites/Monster04.png" id="2_iaah4"]
+
+[node name="worm" instance=ExtResource("1_0wunp")]
+texture = ExtResource("2_iaah4")
+max_health = 30.0
+attack = 1.0

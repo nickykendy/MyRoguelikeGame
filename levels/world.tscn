@@ -23,24 +23,12 @@ layer_1/z_index = 0
 layer_1/tile_data = PackedInt32Array()
 
 [node name="Heroes" parent="." instance=ExtResource("2_n7xmj")]
-position = Vector2(96, 96)
-team = ["hero knight", "hero mage", "hero knight", "hero mage"]
+position = Vector2(64, 64)
+team = ["hero knight", "hero fighter", "hero mage"]
 
 [node name="Monsters" parent="." instance=ExtResource("3_hq5bu")]
-position = Vector2(416, 160)
-team = ["mon bat", "mon bat", "mon bat"]
-
-[node name="Monsters2" parent="." instance=ExtResource("3_hq5bu")]
-position = Vector2(640, 128)
-team = ["mon bat", "mon bat", "mon bat"]
-
-[node name="Monsters3" parent="." instance=ExtResource("3_hq5bu")]
-position = Vector2(608, 224)
-team = ["mon bat"]
-
-[node name="Monsters4" parent="." instance=ExtResource("3_hq5bu")]
-position = Vector2(480, 448)
-team = ["mon bat", "mon bat", "mon bat", "mon bat"]
+position = Vector2(256, 160)
+team = ["mon bat", "mon rat", "mon beholder", "mon worm"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

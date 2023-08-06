@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://ditx01mlwohkj"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_ry151"]
+[ext_resource type="Texture2D" uid="uid://dxxdkssoif8hy" path="res://assets/sprites/hero04.png" id="2_kqks0"]
+
+[node name="hero_fighter" instance=ExtResource("1_ry151")]
+texture = ExtResource("2_kqks0")
+max_health = 25.0
+attack = 2.0

@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://dlj54ir1eue0c"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_qnr3u"]
+[ext_resource type="Texture2D" uid="uid://dsrthy4tci0wl" path="res://assets/sprites/Monster03.png" id="2_egixw"]
+
+[node name="beholder" instance=ExtResource("1_qnr3u")]
+texture = ExtResource("2_egixw")
+is_melee = false

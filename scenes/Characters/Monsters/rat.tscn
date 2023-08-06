@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://nig2nmt887hw"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_2wjmy"]
+[ext_resource type="Texture2D" uid="uid://csm0akti68scn" path="res://assets/sprites/Monster02.png" id="2_x5xee"]
+
+[node name="Rat" instance=ExtResource("1_2wjmy")]
+texture = ExtResource("2_x5xee")
+attack = 1.0

@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://47sd476paexq"]
+
+[ext_resource type="PackedScene" uid="uid://c3rrxdh7ryw5v" path="res://scenes/Characters/Unit.tscn" id="1_blg4s"]
+[ext_resource type="Texture2D" uid="uid://sesa3fx6ob5m" path="res://assets/sprites/hero03.png" id="2_8ph0k"]
+
+[node name="hero_ranger" instance=ExtResource("1_blg4s")]
+texture = ExtResource("2_8ph0k")
+is_melee = false
+max_health = 20.0
+attack = 2.0

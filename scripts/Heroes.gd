@@ -47,14 +47,15 @@ func _rotate_formation(is_clockwise:bool) -> void:
 	tween.set_parallel(true)
 	var length = slots.size()
 	for i in length:
-		if is_clockwise:
-			var next = (i + 1) % length
-			tween.tween_property(slots[i], "position", slots[next].position, 0.2)
-			temp_slots[next] = slots[i]
-		else:
-			var next = (i - 1) % length
-			tween.tween_property(slots[i], "position", slots[next].position, 0.2)
-			temp_slots[next] = slots[i]
+		if slots[i] != null:
+			if is_clockwise:
+				var next = (i + 1) % length
+				tween.tween_property(slots[i], "position", SLOT_POS[next], 0.2)
+				temp_slots[next] = slots[i]
+			else:
+				var next = (i - 1) % length
+				tween.tween_property(slots[i], "position", SLOT_POS[next], 0.2)
+				temp_slots[next] = slots[i]
 	
 	slots = temp_slots.duplicate()
 	temp_slots.clear()
@@ -88,12 +89,12 @@ func heroes_act(dx:int, dy:int) -> void:
 		if !world.monsters.is_empty():
 			for mon in world.monsters:
 				if mon.current_tile == dest:
-					var attackers :Array
+					var attackers :Array = []
 					var from_pos = dest - current_tile
 					var attack_slot := get_adjacent_slot_from_attack_dir(from_pos)
 					
 					for i in slots.size():
-						if slots[i]:
+						if slots[i] != null:
 							if !slots[i].is_melee:
 								attackers.append(slots[i])
 							elif slots[i].is_melee and (i == attack_slot.x or i == attack_slot.y):
