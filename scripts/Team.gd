@@ -43,7 +43,6 @@ func add_member_into_slots(_member:Unit, _index:int, _num:int) -> void:
 	
 	_member.mou_entered.connect(_on_Unit_mou_entered)
 	_member.mou_exited.connect(_on_Unit_mou_exited)
-#	update_team_formation()
 
 
 func _on_Unit_mou_entered(_unit):
@@ -52,19 +51,6 @@ func _on_Unit_mou_entered(_unit):
 
 func _on_Unit_mou_exited(_unit):
 	_unit.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
-
-
-func update_team_formation():
-	if members.is_empty(): return
-	
-	if members.size() >= 3:
-		pass
-		
-	elif members.size() == 2:
-		pass
-		
-	elif members.size() == 1:
-		pass
 
 
 func pos_to_map(_pos:Vector2) -> Vector2i:
@@ -124,7 +110,6 @@ func receive_damage(attacker:Unit, from:Vector2i) -> void:
 					victim.queue_free()
 					if i != -1:
 						members.remove_at(i)
-					update_team_formation()
 					if members.is_empty():
 						dead = true
 		else:
@@ -136,7 +121,6 @@ func receive_damage(attacker:Unit, from:Vector2i) -> void:
 				if members[i].dead == true:
 					members[i].queue_free()
 					members.remove_at(i)
-					update_team_formation()
 					if members.is_empty():
 						dead = true
 	else:
