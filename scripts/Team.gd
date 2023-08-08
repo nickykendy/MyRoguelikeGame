@@ -15,25 +15,35 @@ signal dmg_taken
 
 func _initialization():
 	current_tile = pos_to_map(position)
-	slots.resize(4)
 
 
 func set_team(new_team):
 	team = new_team
-	for i in new_team.size():
+	var length = new_team.size()
+	for i in length:
 		var new_member = load(Game.UNITS[new_team[i]]).instantiate()
 		if new_member:
 			members.append(new_member)
-			slots.append(new_member)
-			call_deferred("add_member_into_slots", new_member)
+			call_deferred("add_member_into_slots", new_member, i, length)
 	
 
 
-func add_member_into_slots(_member:Unit) -> void:
-	add_child(_member, true)
+func add_member_into_slots(_member:Unit, _index:int, _num:int) -> void:
+	var a = get_node("slot0")
+	_member.in_slot = _index
+	match _num:
+		1:
+			get_node("slot8").add_child(_member, true)
+		2:
+			var slot_name = "slot" + str(_index + 4)
+			get_node(slot_name).add_child(_member, true)
+		_:
+			var slot_name = "slot" + str(_index)
+			get_node(slot_name).add_child(_member, true)
+	
 	_member.mou_entered.connect(_on_Unit_mou_entered)
 	_member.mou_exited.connect(_on_Unit_mou_exited)
-	update_team_formation()
+#	update_team_formation()
 
 
 func _on_Unit_mou_entered(_unit):
@@ -46,7 +56,6 @@ func _on_Unit_mou_exited(_unit):
 
 func update_team_formation():
 	if members.is_empty(): return
-	if slots.is_empty(): return
 	
 	if members.size() >= 3:
 		if slots[0] != null:

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://7nrqcqrfvx63"]
+[gd_scene load_steps=3 format=3 uid="uid://7nrqcqrfvx63"]
 
+[ext_resource type="PackedScene" uid="uid://hnkgpvjxg4r8" path="res://scenes/Characters/Team.tscn" id="1_mmu6g"]
 [ext_resource type="Script" path="res://scripts/Monsters.gd" id="1_skr8a"]
 
-[node name="Monsters" type="Node2D" groups=["monsters"]]
+[node name="Monsters" instance=ExtResource("1_mmu6g")]
 script = ExtResource("1_skr8a")

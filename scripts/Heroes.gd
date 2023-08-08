@@ -40,25 +40,35 @@ func _input(event):
 
 func _rotate_formation(is_clockwise:bool) -> void:
 	if members.is_empty(): return
-	if slots.is_empty():return
 	
-	var temp_slots = slots.duplicate()
 	var tween = create_tween()
 	tween.set_parallel(true)
-	var length = slots.size()
-	for i in length:
-		if slots[i] != null:
-			if is_clockwise:
-				var next = (i + 1) % length
-				tween.tween_property(slots[i], "position", SLOT_POS[next], 0.2)
-				temp_slots[next] = slots[i]
-			else:
-				var next = (i - 1) % length
-				tween.tween_property(slots[i], "position", SLOT_POS[next], 0.2)
-				temp_slots[next] = slots[i]
 	
-	slots = temp_slots.duplicate()
-	temp_slots.clear()
+	var length = members.size()
+	for i in length:
+		var next := 0
+		var new_slot_name := ""
+		if is_clockwise:
+			next = (members[i].in_slot + 1) % 4
+		else:
+			next = (members[i].in_slot - 1) % 4
+		
+		match length:
+			# 成员数量为3或者4时
+			_:
+				new_slot_name = "slot" + str(next)
+			# 成员数量为2时
+			2:
+				new_slot_name = "slot" + str(next + 5)
+			# 成员数量为1时
+			1:
+				new_slot_name = "slot" + str(next + 8)
+		
+		var new_slot = get_node(new_slot_name)
+		tween.tween_property(members[i], "global_position", new_slot.global_position, 0.2)
+		members[i].reparent(new_slot, true)
+		members[i].in_slot = next
+	
 
 
 func _unhandled_input(event):

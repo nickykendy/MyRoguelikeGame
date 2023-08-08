@@ -5,6 +5,7 @@ class_name Unit
 var dead := false
 var cur_health :float: set = set_cur_health
 var unit_name :String
+var in_slot :int
 
 @export var is_melee :bool = true
 @export var max_health :float = 10.0

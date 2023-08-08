@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://hnkgpvjxg4r8"]
+
+[ext_resource type="Script" path="res://scripts/Team.gd" id="1_2hgpv"]
+
+[node name="Team" type="Node2D"]
+script = ExtResource("1_2hgpv")
+
+[node name="slot0" type="Node2D" parent="."]
+position = Vector2(8, 8)
+
+[node name="slot1" type="Node2D" parent="."]
+position = Vector2(24, 8)
+
+[node name="slot2" type="Node2D" parent="."]
+position = Vector2(24, 24)
+
+[node name="slot3" type="Node2D" parent="."]
+position = Vector2(8, 24)
+
+[node name="slot4" type="Node2D" parent="."]
+position = Vector2(16, 8)
+
+[node name="slot5" type="Node2D" parent="."]
+position = Vector2(16, 24)
+
+[node name="slot6" type="Node2D" parent="."]
+position = Vector2(8, 16)
+
+[node name="slot7" type="Node2D" parent="."]
+position = Vector2(24, 16)
+
+[node name="slot8" type="Node2D" parent="."]
+position = Vector2(16, 16)
