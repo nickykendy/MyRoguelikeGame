@@ -29,16 +29,17 @@ func set_team(new_team):
 
 
 func add_member_into_slots(_member:Unit, _index:int, _num:int) -> void:
-	var a = get_node("slot0")
-	_member.in_slot = _index
 	match _num:
 		1:
+			_member.in_slot = 8
 			get_node("slot8").add_child(_member, true)
 		2:
-			var slot_name = "slot" + str(_index + 4)
+			_member.in_slot = _index + _index + 4
+			var slot_name = "slot" + str(_member.in_slot)
 			get_node(slot_name).add_child(_member, true)
 		_:
-			var slot_name = "slot" + str(_index)
+			_member.in_slot = _index
+			var slot_name = "slot" + str(_member.in_slot)
 			get_node(slot_name).add_child(_member, true)
 	
 	_member.mou_entered.connect(_on_Unit_mou_entered)

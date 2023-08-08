@@ -24,7 +24,7 @@ layer_1/tile_data = PackedInt32Array()
 
 [node name="Heroes" parent="." instance=ExtResource("2_n7xmj")]
 position = Vector2(64, 64)
-team = ["hero knight", "hero fighter", "hero mage"]
+team = ["hero knight", "hero fighter", "hero ranger", "hero mage"]
 
 [node name="Monsters" parent="." instance=ExtResource("3_hq5bu")]
 position = Vector2(256, 160)

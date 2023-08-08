@@ -48,22 +48,38 @@ func _rotate_formation(is_clockwise:bool) -> void:
 	for i in length:
 		var next := 0
 		var new_slot_name := ""
+		var member_slot = members[i].in_slot
 		if is_clockwise:
-			next = (members[i].in_slot + 1) % 4
+			if length >= 3:
+				next = (member_slot + 1) % 4
+			elif length == 2:
+				if member_slot % 2 == 0:
+					next = member_slot + 1
+				else:
+					if member_slot == 7:
+						next = 4
+					else:
+						next = 6
+			else:
+				next = 8
 		else:
-			next = (members[i].in_slot - 1) % 4
+			if length >= 3:
+				if member_slot == 0:
+					next = 3
+				else:
+					next = member_slot - 1
+			elif length == 2:
+				if member_slot % 2 == 0:
+					if member_slot == 4:
+						next = 7
+					else:
+						next = 5
+				else:
+					next = member_slot - 1
+			else:
+				next = 8
 		
-		match length:
-			# 成员数量为3或者4时
-			_:
-				new_slot_name = "slot" + str(next)
-			# 成员数量为2时
-			2:
-				new_slot_name = "slot" + str(next + 5)
-			# 成员数量为1时
-			1:
-				new_slot_name = "slot" + str(next + 8)
-		
+		new_slot_name = "slot" + str(next)
 		var new_slot = get_node(new_slot_name)
 		tween.tween_property(members[i], "global_position", new_slot.global_position, 0.2)
 		members[i].reparent(new_slot, true)

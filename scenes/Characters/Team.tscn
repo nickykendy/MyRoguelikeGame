@@ -21,13 +21,13 @@ position = Vector2(8, 24)
 position = Vector2(16, 8)
 
 [node name="slot5" type="Node2D" parent="."]
-position = Vector2(16, 24)
+position = Vector2(24, 16)
 
 [node name="slot6" type="Node2D" parent="."]
-position = Vector2(8, 16)
+position = Vector2(16, 24)
 
 [node name="slot7" type="Node2D" parent="."]
-position = Vector2(24, 16)
+position = Vector2(8, 16)
 
 [node name="slot8" type="Node2D" parent="."]
 position = Vector2(16, 16)
