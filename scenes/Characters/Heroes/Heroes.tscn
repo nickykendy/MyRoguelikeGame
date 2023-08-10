@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://hnkgpvjxg4r8" path="res://scenes/Characters/Team.tscn" id="1_6y4dy"]
 [ext_resource type="Script" path="res://scripts/Heroes.gd" id="1_as48d"]
 
-[node name="Heroes" instance=ExtResource("1_6y4dy")]
+[node name="Heroes" groups=["heroes"] instance=ExtResource("1_6y4dy")]
 script = ExtResource("1_as48d")
 
 [node name="Camera2D" type="Camera2D" parent="." index="9"]

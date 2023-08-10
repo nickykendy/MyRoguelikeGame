@@ -35,7 +35,7 @@ func _input(event):
 			_rotate_formation(false)
 	
 	if event.is_action_pressed("test"):
-		print(slots)
+		print("slots")
 
 
 func _rotate_formation(is_clockwise:bool) -> void:
@@ -96,7 +96,6 @@ func _unhandled_input(event):
 
 
 func heroes_act(dx:int, dy:int) -> void:
-	if slots.is_empty(): return
 	var tile_map :TileMap = get_parent().get_node("TileMap")
 	if tile_map == null: return
 	var world :Node2D = get_parent()
@@ -117,14 +116,15 @@ func heroes_act(dx:int, dy:int) -> void:
 				if mon.current_tile == dest:
 					var attackers :Array = []
 					var from_pos = dest - current_tile
-					var attack_slot := get_adjacent_slot_from_attack_dir(from_pos)
-					
-					for i in slots.size():
-						if slots[i] != null:
-							if !slots[i].is_melee:
-								attackers.append(slots[i])
-							elif slots[i].is_melee and (i == attack_slot.x or i == attack_slot.y):
-								attackers.append(slots[i])
+					var attack_slots := get_adjacent_slot_from_attack_dir(from_pos)
+					# 判断英雄们，近战需要在靠近敌人的格子才能发动攻击
+					for i in members.size():
+						if !members[i].is_melee:
+							attackers.append(members[i])
+						else:
+							for _slot in attack_slots:
+								if members[i].in_slot == _slot:
+									attackers.append(members[i])
 						
 					for attacker in attackers:
 						mon.receive_damage(attacker, current_tile)
@@ -148,8 +148,6 @@ func heroes_act(dx:int, dy:int) -> void:
 
 
 func _process(_delta):
-	if slots.is_empty(): return
-	
 	if Input.is_action_pressed("mouse left"):
 		if !picked:
 			var mouse_pos = get_global_mouse_position()
@@ -162,16 +160,24 @@ func _process(_delta):
 		if picked:
 			var mouse_pos = get_global_mouse_position()
 			var _hero = get_member_by_pos(mouse_pos)
-			if _hero != picked:
-				var origin_index = slots.find(picked)
-				var switch_index = slots.find(_hero)
-				var temp_slots = slots.duplicate()
-				temp_slots[origin_index] = slots[switch_index]
-				temp_slots[switch_index] = slots[origin_index]
-				slots = temp_slots.duplicate()
-				temp_slots.clear()
+			if _hero != null and _hero != picked:
+				var tween = create_tween()
+				tween.set_parallel(true)
+				
+				var origin_slot_index = picked.in_slot
+				var replace_slot_index = _hero.in_slot
+				var origin_slot = get_node("slot" + str(origin_slot_index))
+				var replace_slot = get_node("slot" + str(replace_slot_index))
+				
+				tween.tween_property(_hero, "global_position", origin_slot.global_position, 0.2)
+				_hero.reparent(origin_slot, true)
+				_hero.in_slot = origin_slot_index
+				
+				tween.tween_property(picked, "global_position", replace_slot.global_position, 0.2)
+				picked.reparent(replace_slot, true)
+				picked.in_slot = replace_slot_index
+				
 		picked = null
-		update_team_formation()
 
 
 func _on_Unit_mou_entered(_unit):

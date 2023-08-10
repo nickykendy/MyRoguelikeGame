@@ -3,7 +3,6 @@ class_name Team
 
 var current_tile :Vector2i
 var members :Array
-var slots :Array
 var dead := false
 
 @export var team :Array: set = set_team
@@ -59,40 +58,13 @@ func update_team_formation():
 	if members.is_empty(): return
 	
 	if members.size() >= 3:
-		if slots[0] != null:
-			slots[0].position = Vector2(8, 8)
-		if slots[1] != null:
-			slots[1].position = Vector2(24, 8)
-		if slots[2] != null:
-			slots[2].position = Vector2(24, 24)
-		if slots[3] != null:
-			slots[3].position = Vector2(8, 24)
+		pass
 		
 	elif members.size() == 2:
-		var left :Array = []
-		for i in slots.size():
-			if slots[i] == null:
-				slots.remove_at(i)
-			else:
-				left.append(i)
-		
-		var left_array := Vector2(left[0], left[1])
-		if left_array == Vector2(0, 1) or left_array == Vector2(3, 2) or left_array == Vector2(3, 1):
-			slots[0].position = Vector2(8, 16)
-			slots[1].position = Vector2(24, 16)
-		elif left_array == Vector2(1, 2) or left_array == Vector2(0, 3) or left_array == Vector2(0, 2):
-			slots[0].position = Vector2(16, 8)
-			slots[1].position = Vector2(16, 24)
-		else:
-			slots[0].position = Vector2(8, 16)
-			slots[1].position = Vector2(24, 16)
+		pass
 		
 	elif members.size() == 1:
-		for i in slots.size():
-			if slots[i] == null:
-				slots.remove_at(i)
-		
-		slots[0].position = Vector2(16, 16)
+		pass
 
 
 func pos_to_map(_pos:Vector2) -> Vector2i:
@@ -109,15 +81,13 @@ func map_to_pos(_map:Vector2i) -> Vector2:
 
 func get_member_by_pos(_pos:Vector2) -> Unit:
 	if members.is_empty(): return
-	if slots.is_empty():return
 	
 	var _member :Unit = null
-	for slot in slots:
-		if slot != null:
-			var unit_pos = slot.global_position
-			if _pos.x > unit_pos.x - 8 and _pos.x < unit_pos.x + 8 and _pos.y > unit_pos.y - 8 and _pos.y < unit_pos.y + 8:
-				_member = slot
-				break
+	for _m in members:
+		var unit_pos = _m.global_position
+		if _pos.x > unit_pos.x - 8 and _pos.x < unit_pos.x + 8 and _pos.y > unit_pos.y - 8 and _pos.y < unit_pos.y + 8:
+			_member = _m
+			break
 	
 	return _member
 
@@ -133,25 +103,17 @@ func receive_damage(attacker:Unit, from:Vector2i) -> void:
 	if length > 0:
 		if attacker.is_melee:
 			var dir = from - current_tile
-			var defend_slot :Vector2i = get_adjacent_slot_from_attack_dir(dir)
-			var available := check_adjacent_slot_available(defend_slot)
+			var defend_slots := get_adjacent_slot_from_attack_dir(dir)
+			var available := check_adjacent_slot_available(defend_slots)
 			var victim :Unit
 			
-			if available.size() > 1:
-				if randi_range(1, 100) > 50:
-					victim = slots[defend_slot.x]
-				else:
-					victim = slots[defend_slot.y]
-			elif available.size() == 1:
-				victim = available[0]
+			if !available.is_empty():
+				var i = randi_range(0, available.size() - 1)
+				victim = available[i]
 			else:
-				if members.size() > 1:
-					if randi_range(1, 100) > 50:
-						victim = members[0]
-					else:
-						victim = members[1]
-				elif members.size() == 1:
-					victim = members[0]
+				if !members.is_empty():
+					var i = randi_range(0, members.size() - 1)
+					victim = members[i]
 			
 			if victim:
 				victim.take_damage(dmg)
@@ -181,32 +143,37 @@ func receive_damage(attacker:Unit, from:Vector2i) -> void:
 		dead = true
 
 
-func get_adjacent_slot_from_attack_dir(_direction:Vector2i) -> Vector2i:
-	var adjacent_slot := Vector2i.ZERO
+func get_adjacent_slot_from_attack_dir(_direction:Vector2i) -> Array:
+	var adjacent_slots :Array
 	if _direction == Vector2i.RIGHT:
-		adjacent_slot = Vector2i(1, 2)
+		adjacent_slots = [1, 2, 4, 5, 6]
 	elif _direction == Vector2i.LEFT:
-		adjacent_slot = Vector2i(0, 3)
+		adjacent_slots = [0, 3, 4, 7, 6]
 	elif _direction == Vector2i.UP:
-		adjacent_slot = Vector2i(0, 1)
+		adjacent_slots = [0, 1, 4, 5, 7]
 	elif _direction == Vector2i.DOWN:
-		adjacent_slot = Vector2i(3, 2)
+		adjacent_slots = [3, 2, 5, 6, 7]
 	
-	return adjacent_slot
+	return adjacent_slots
 
 
-func check_adjacent_slot_available(_adjacent_slot:Vector2i) -> Array:
+func check_adjacent_slot_available(_adjacent_slots:Array) -> Array:
 	var available :Array = []
-	if slots.is_empty(): return available
-	
-	if slots[_adjacent_slot.x] != null:
-		available.append(slots[_adjacent_slot.x])
-	
-	if slots[_adjacent_slot.y] != null:
-		available.append(slots[_adjacent_slot.y])
+	for _slot in _adjacent_slots:
+		var _member = get_member_by_slot_index(_slot)
+		if _member != null:
+			available.append(_member)
 	
 	return available
 
 
-func _recalculate_slots() -> void:
-	pass
+func get_member_by_slot_index(_index:int) -> Unit:
+	if members.is_empty(): return
+	
+	var member :Unit = null
+	for _m in members:
+		if _m.in_slot == _index:
+			member = _m
+			break
+	
+	return member 

@@ -22,14 +22,16 @@ func act(pathfinding, monsters):
 		if dest == player_ref.current_tile:
 			var attackers :Array = []
 			var from_pos = dest - current_tile
-			var attack_slot := get_adjacent_slot_from_attack_dir(from_pos)
+			var attack_slots := get_adjacent_slot_from_attack_dir(from_pos)
 			
-			for i in slots.size():
-				if slots[i] != null:
-					if !slots[i].is_melee:
-						attackers.append(slots[i])
-					elif slots[i].is_melee and (i == attack_slot.x or i == attack_slot.y):
-						attackers.append(slots[i])
+			for i in members.size():
+				if members[i] != null:
+					if !members[i].is_melee:
+						attackers.append(members[i])
+					else:
+						for _slot in attack_slots:
+							if members[i].in_slot == _slot:
+								attackers.append(members[i])
 				
 			for attacker in attackers:
 				player_ref.receive_damage(attacker, current_tile)
