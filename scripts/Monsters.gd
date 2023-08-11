@@ -34,7 +34,11 @@ func act(pathfinding, monsters):
 								attackers.append(members[i])
 				
 			for attacker in attackers:
-				player_ref.receive_damage(attacker, current_tile)
+				var tween = create_tween()
+				tween.tween_property(attacker, "scale", Vector2(1.2, 1.2), 0.1)
+				tween.tween_property(attacker, "scale", Vector2(1.0, 1.0), 0.1)
+				tween.tween_callback(player_ref.receive_damage.bind(attacker, current_tile))
+				await get_tree().create_timer(0.2).timeout
 			
 		else:
 			var blocked = false
@@ -45,4 +49,7 @@ func act(pathfinding, monsters):
 			
 			if !blocked:
 				current_tile = dest
-				position = current_tile * Game.TILESIZE
+				
+		try_act.emit(dest)
+		position = current_tile * Game.TILESIZE
+		acted.emit()

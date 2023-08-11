@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var tile_map := $TileMap
 @onready var text_panel := $CanvasLayer/UI/VBoxContainer/TextEdit
+@onready var TurnLabel := $CanvasLayer/UI/HBoxContainer/TurnLabel
 
 var astar :AStarGrid2D
 var monsters :Array
@@ -10,6 +11,7 @@ var heroes :Array
 var map :Dictionary = {}
 var fov_map :MRPAS
 var battle_log :String
+var acted_monster_num := 0
 
 
 func _ready():
@@ -29,45 +31,89 @@ func _ready():
 	
 	monsters = get_tree().get_nodes_in_group("monsters")
 	heroes = get_tree().get_nodes_in_group("heroes")
-	var all_characters := monsters.duplicate()
-	all_characters.append_array(heroes.duplicate())
 	
 	if !heroes.is_empty():
-		heroes[0].moved.connect(_on_Hero_moved)
-		heroes[0].try_move.connect(_on_Hero_try_move)
+		heroes[0].acted.connect(_on_Hero_acted)
+		heroes[0].try_act.connect(_on_Hero_try_act)
+		heroes[0].dmg_taken.connect(_on_Team_dmg_taken)
+		heroes[0].open_door.connect(_on_Hero_open_door)
 	
-	if !all_characters.is_empty():
-		for _char in all_characters:
-			_char.dmg_taken.connect(_on_Team_dmg_taken)
+	if !monsters.is_empty():
+		for _m in monsters:
+			_m.acted.connect(_on_Monster_acted)
+			_m.try_act.connect(_on_Monster_try_act)
+			_m.dmg_taken.connect(_on_Team_dmg_taken)
+			_m.died.connect(_on_Monster_died)
 	
 	_populate_mrpas()
 	_compute_field_of_view()
 	_update_monsters_visibility()
 
 
-func _on_Hero_moved() -> void:
-	if heroes.is_empty(): return
-	
+func _on_Hero_acted() -> void:
+	TurnLabel.text = "MonsterTurn"
 	await get_tree().create_timer(0.2).timeout
+	acted_monster_num = 0
 	if !monsters.is_empty():
 		for mon in monsters:
 			mon.act(astar, monsters)
-	
-	heroes[0].is_hero_turn = true
+	else:
+		_switch_turn(true)
 
 
-func _on_Hero_try_move(coord:Vector2i, tileType:Vector2i) -> void:
+func _on_Hero_try_act(coord:Vector2i) -> void:
 	if map.is_empty(): return
 	if !fov_map: return
 	
-	if tileType == Game.TILE_DOOR:
-		astar.set_point_solid(coord, false)
-		map[coord].is_walkable = true
-		fov_map.set_transparent(coord, true)
-		
 	_compute_field_of_view()
 	_update_monsters_visibility()
 
+
+func _on_Hero_open_door(coord:Vector2i) -> void:
+	if map.is_empty(): return
+	if !fov_map: return
+	
+	astar.set_point_solid(coord, false)
+	map[coord].is_walkable = true
+	fov_map.set_transparent(coord, true)
+	_compute_field_of_view()
+	_update_monsters_visibility()
+
+func _on_Monster_acted() -> void:
+	if heroes.is_empty(): return
+	
+	var is_monster_turn = true
+	acted_monster_num += 1
+	if !monsters.is_empty():
+		if acted_monster_num >= monsters.size():
+			is_monster_turn = false
+	else:
+		is_monster_turn = false
+	
+	if !is_monster_turn:
+		_switch_turn(true)
+
+
+func _on_Monster_try_act(coord:Vector2i) -> void:
+	pass
+
+
+func _on_Monster_died(_monster) -> void:
+	var i = monsters.find(_monster)
+	monsters.remove_at(i)
+	if monsters.is_empty() and !heroes.is_empty():
+		_switch_turn(true)
+
+
+func _switch_turn(_is_hero_turn:bool) ->void:
+	if heroes.is_empty(): return
+	
+	if _is_hero_turn:
+		heroes[0].is_hero_turn = true
+		TurnLabel.text = "PlayerTurn"
+	else:
+		heroes[0].is_hero_turn = false
+		TurnLabel.text = "MonsterTurn"
 
 func _on_Team_dmg_taken(attacker:Unit, victim:Unit, dmg:float) -> void:
 	if battle_log:

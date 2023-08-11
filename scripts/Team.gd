@@ -2,14 +2,18 @@ extends Node2D
 class_name Team
 
 var current_tile :Vector2i
-var members :Array
 var dead := false
+var members :Array
 
 @export var team :Array: set = set_team
 
-const SLOT_POS := [Vector2(8, 8), Vector2(24, 8), Vector2(24, 24), Vector2(8, 24)]
+const SLOT_V := [Vector2(0, 3), Vector2(3, 0), Vector2(1, 2), Vector2(2, 1), Vector2(0, 2), Vector2(2, 0)]
+const SLOT_H := [Vector2(0, 1), Vector2(1, 0), Vector2(3, 2), Vector2(2, 3), Vector2(3, 1), Vector2(1, 3)]
 
 signal dmg_taken
+signal acted
+signal try_act
+signal died
 
 
 func _initialization():
@@ -24,7 +28,6 @@ func set_team(new_team):
 		if new_member:
 			members.append(new_member)
 			call_deferred("add_member_into_slots", new_member, i, length)
-	
 
 
 func add_member_into_slots(_member:Unit, _index:int, _num:int) -> void:
@@ -45,6 +48,87 @@ func add_member_into_slots(_member:Unit, _index:int, _num:int) -> void:
 	_member.mou_exited.connect(_on_Unit_mou_exited)
 
 
+func update_formation() -> void:
+	if members.is_empty(): return
+	
+	var length := members.size()
+	var tween := create_tween()
+	tween.set_parallel(true)
+	var next := 0
+	
+	match length:
+		1:
+			next = 8
+			var new_slot = get_node("slot" + str(next))
+			tween.tween_property(members[0], "global_position", new_slot.global_position, 0.2)
+			members[0].reparent(new_slot, true)
+			members[0].in_slot = next
+		2:
+			var old_slot := Vector2(members[0].in_slot, members[1].in_slot)
+			var new_next := 0
+			if SLOT_H.find(old_slot) != -1:
+				new_next = 4
+			elif SLOT_V.find(old_slot) != -1:
+				new_next = 5
+			
+			for i in length:
+				next = new_next + i + i
+				var new_slot = get_node("slot" + str(next))
+				tween.tween_property(members[i], "global_position", new_slot.global_position, 0.2)
+				members[i].reparent(new_slot, true)
+				members[i].in_slot = next
+		_:
+			pass
+
+
+func rotate_formation(is_clockwise:bool) -> void:
+	if members.is_empty(): return
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	var length = members.size()
+	for i in length:
+		var next := 0
+		var new_slot_name := ""
+		var member_slot = members[i].in_slot
+		if is_clockwise:
+			if length >= 3:
+				next = (member_slot + 1) % 4
+			elif length == 2:
+				if member_slot % 2 == 0:
+					next = member_slot + 1
+				else:
+					if member_slot == 7:
+						next = 4
+					else:
+						next = 6
+			else:
+				next = 8
+		else:
+			if length >= 3:
+				if member_slot == 0:
+					next = 3
+				else:
+					next = member_slot - 1
+			elif length == 2:
+				if member_slot % 2 == 0:
+					if member_slot == 4:
+						next = 7
+					else:
+						next = 5
+				else:
+					next = member_slot - 1
+			else:
+				next = 8
+		
+		new_slot_name = "slot" + str(next)
+		var new_slot = get_node(new_slot_name)
+		tween.tween_property(members[i], "global_position", new_slot.global_position, 0.2)
+		members[i].reparent(new_slot, true)
+		members[i].in_slot = next
+
+
 func _on_Unit_mou_entered(_unit):
 	_unit.self_modulate = Color(0.0, 1.0, 0.0, 1.0)
 
@@ -54,8 +138,8 @@ func _on_Unit_mou_exited(_unit):
 
 
 func pos_to_map(_pos:Vector2) -> Vector2i:
-	var _x = _pos.x / Game.TILESIZE
-	var _y = _pos.y / Game.TILESIZE
+	var _x = int(_pos.x / Game.TILESIZE)
+	var _y = int(_pos.y / Game.TILESIZE)
 	return Vector2i(_x, _y)
 
 
@@ -121,10 +205,10 @@ func receive_damage(attacker:Unit, from:Vector2i) -> void:
 				if members[i].dead == true:
 					members[i].queue_free()
 					members.remove_at(i)
+					update_formation()
 					if members.is_empty():
 						dead = true
-	else:
-		dead = true
+						died.emit(self)
 
 
 func get_adjacent_slot_from_attack_dir(_direction:Vector2i) -> Array:

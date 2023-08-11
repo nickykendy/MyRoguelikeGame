@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://csm8hr4yp7psj"]
+[gd_scene load_steps=5 format=3 uid="uid://csm8hr4yp7psj"]
 
 [ext_resource type="TileSet" uid="uid://cywpxt7comtpf" path="res://assets/tiles/DungeonTiles.tres" id="1_4n76x"]
 [ext_resource type="Script" path="res://scripts/GameWorld.gd" id="1_mt4a4"]
 [ext_resource type="PackedScene" uid="uid://e377k2m2ijhw" path="res://scenes/Characters/Heroes/Heroes.tscn" id="2_n7xmj"]
 [ext_resource type="PackedScene" uid="uid://7nrqcqrfvx63" path="res://scenes/Characters/Monsters/Monsters.tscn" id="3_hq5bu"]
-[ext_resource type="Script" path="res://scripts/UI.gd" id="5_wldhq"]
 
 [node name="world" type="Node2D"]
 script = ExtResource("1_mt4a4")
@@ -28,7 +27,7 @@ team = ["hero knight", "hero fighter", "hero ranger", "hero mage"]
 
 [node name="Monsters" parent="." instance=ExtResource("3_hq5bu")]
 position = Vector2(256, 160)
-team = ["mon bat", "mon rat", "mon beholder", "mon worm"]
+team = ["mon bat", "mon rat", "mon bat"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -40,7 +39,6 @@ anchor_bottom = 1.0
 offset_top = -400.0
 offset_right = 640.0
 grow_vertical = 0
-script = ExtResource("5_wldhq")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI"]
 layout_mode = 1
@@ -69,3 +67,18 @@ text = "
 "
 scroll_smooth = true
 scroll_past_end_of_file = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -44.5
+offset_right = 44.5
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="TurnLabel" type="Label" parent="CanvasLayer/UI/HBoxContainer"]
+layout_mode = 2
+text = "Player Turn"
+horizontal_alignment = 1

@@ -6,8 +6,7 @@ var is_hero_turn := true
 var fov_range := 6
 var picked :Unit = null
 
-signal moved
-signal try_move
+signal open_door
 
 
 func _ready():
@@ -30,61 +29,12 @@ func _input(event):
 		elif event.is_action_pressed("wait"):
 			heroes_act(0, 0)
 		elif event.is_action_pressed("rotate clockwise"):
-			_rotate_formation(true)
+			rotate_formation(true)
 		elif event.is_action_pressed("rotate anticlockwise"):
-			_rotate_formation(false)
+			rotate_formation(false)
 	
 	if event.is_action_pressed("test"):
 		print("slots")
-
-
-func _rotate_formation(is_clockwise:bool) -> void:
-	if members.is_empty(): return
-	
-	var tween = create_tween()
-	tween.set_parallel(true)
-	
-	var length = members.size()
-	for i in length:
-		var next := 0
-		var new_slot_name := ""
-		var member_slot = members[i].in_slot
-		if is_clockwise:
-			if length >= 3:
-				next = (member_slot + 1) % 4
-			elif length == 2:
-				if member_slot % 2 == 0:
-					next = member_slot + 1
-				else:
-					if member_slot == 7:
-						next = 4
-					else:
-						next = 6
-			else:
-				next = 8
-		else:
-			if length >= 3:
-				if member_slot == 0:
-					next = 3
-				else:
-					next = member_slot - 1
-			elif length == 2:
-				if member_slot % 2 == 0:
-					if member_slot == 4:
-						next = 7
-					else:
-						next = 5
-				else:
-					next = member_slot - 1
-			else:
-				next = 8
-		
-		new_slot_name = "slot" + str(next)
-		var new_slot = get_node(new_slot_name)
-		tween.tween_property(members[i], "global_position", new_slot.global_position, 0.2)
-		members[i].reparent(new_slot, true)
-		members[i].in_slot = next
-	
 
 
 func _unhandled_input(event):
@@ -127,7 +77,11 @@ func heroes_act(dx:int, dy:int) -> void:
 									attackers.append(members[i])
 						
 					for attacker in attackers:
-						mon.receive_damage(attacker, current_tile)
+						var tween = create_tween()
+						tween.tween_property(attacker, "scale", Vector2(1.2, 1.2), 0.1)
+						tween.tween_property(attacker, "scale", Vector2(1.0, 1.0), 0.1)
+						tween.tween_callback(mon.receive_damage.bind(attacker, current_tile))
+						await get_tree().create_timer(0.2).timeout
 					
 					if mon.dead:
 						world.monsters.erase(mon)
@@ -139,10 +93,11 @@ func heroes_act(dx:int, dy:int) -> void:
 	# 尝试打开门
 	elif tile == Game.TILE_DOOR:
 		tile_map.set_cell(0, dest, 0, Game.TILE_FLOOR)
+		open_door.emit(dest)
 	
-	try_move.emit(dest, tile)
+	try_act.emit(dest)
 	position = current_tile * Game.TILESIZE
-	moved.emit()
+	acted.emit()
 	
 	is_hero_turn = false
 

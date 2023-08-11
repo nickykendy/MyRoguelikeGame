@@ -22,6 +22,9 @@ func _ready():
 
 
 func take_damage(dmg:int) -> void:
+	var tween = create_tween()
+	tween.tween_property(self, "self_modulate", Color.RED, 0.1)
+	tween.tween_property(self, "self_modulate", Color.WHITE, 0.1)
 	cur_health = cur_health - dmg
 	if cur_health <= 0:
 		dead = true
