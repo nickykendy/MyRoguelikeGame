@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cnvlvgkdyirxo"]
+
+[ext_resource type="Script" path="res://scripts/skill/range.gd" id="1_fnmqu"]
+
+[node name="range" type="Node"]
+script = ExtResource("1_fnmqu")

@@ -194,6 +194,7 @@ func receive_damage(attacker:Unit, from:Vector2i) -> void:
 					victim.queue_free()
 					if i != -1:
 						members.remove_at(i)
+						update_formation()
 					if members.is_empty():
 						dead = true
 		else:

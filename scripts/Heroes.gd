@@ -6,8 +6,6 @@ var is_hero_turn := true
 var fov_range := 6
 var picked :Unit = null
 
-signal open_door
-
 
 func _ready():
 	_initialization()
@@ -55,15 +53,16 @@ func heroes_act(dx:int, dy:int) -> void:
 	var _y := current_tile.y + dy
 	
 	var dest := Vector2i(_x, _y)
-	
 	var tile := tile_map.get_cell_atlas_coords(0, dest)
+	var is_open_door := false
 	
-	# 尝试移动到地板
+	# 尝试移动时，遇敌发起攻击
 	if tile == Game.TILE_FLOOR:
 		var blocked = false
 		if !world.monsters.is_empty():
 			for mon in world.monsters:
-				if mon.current_tile == dest:
+				var mon_pos = mon.current_tile
+				if mon_pos == dest:
 					var attackers :Array = []
 					var from_pos = dest - current_tile
 					var attack_slots := get_adjacent_slot_from_attack_dir(from_pos)
@@ -87,15 +86,21 @@ func heroes_act(dx:int, dy:int) -> void:
 						world.monsters.erase(mon)
 					blocked = true
 					break
+					
+				elif world.map[mon_pos].is_in_view:
+					for i in members.size():
+						if members[i].has_node("range"):
+							var range_node = members[i].get_node("range")
+							range_node.cast_skill(mon)
 		
 		if !blocked:
 			current_tile = dest
 	# 尝试打开门
 	elif tile == Game.TILE_DOOR:
 		tile_map.set_cell(0, dest, 0, Game.TILE_FLOOR)
-		open_door.emit(dest)
+		is_open_door = true
 	
-	try_act.emit(dest)
+	try_act.emit(dest, is_open_door)
 	position = current_tile * Game.TILESIZE
 	acted.emit()
 	
@@ -109,21 +114,22 @@ func _process(_delta):
 			var _hero = get_member_by_pos(mouse_pos)
 			if _hero:
 				picked = _hero
-				_hero.global_position = mouse_pos
+				var tween = create_tween()
+				tween.tween_property(_hero, "scale", Vector2(1.2, 1.2), 0.1)
 		
 	elif Input.is_action_just_released("mouse left"):
 		if picked:
 			var mouse_pos = get_global_mouse_position()
 			var _hero = get_member_by_pos(mouse_pos)
+			var tween = create_tween()
+			
 			if _hero != null and _hero != picked:
-				var tween = create_tween()
-				tween.set_parallel(true)
-				
 				var origin_slot_index = picked.in_slot
 				var replace_slot_index = _hero.in_slot
 				var origin_slot = get_node("slot" + str(origin_slot_index))
 				var replace_slot = get_node("slot" + str(replace_slot_index))
 				
+				tween.set_parallel(true)
 				tween.tween_property(_hero, "global_position", origin_slot.global_position, 0.2)
 				_hero.reparent(origin_slot, true)
 				_hero.in_slot = origin_slot_index
@@ -131,8 +137,9 @@ func _process(_delta):
 				tween.tween_property(picked, "global_position", replace_slot.global_position, 0.2)
 				picked.reparent(replace_slot, true)
 				picked.in_slot = replace_slot_index
-				
-		picked = null
+			
+			tween.tween_property(picked, "scale", Vector2(1.0, 1.0), 0.1)
+			picked = null
 
 
 func _on_Unit_mou_entered(_unit):
