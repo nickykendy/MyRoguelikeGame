@@ -149,6 +149,13 @@ func map_to_pos(_map:Vector2i) -> Vector2:
 	return Vector2(_x, _y)
 
 
+func is_in_bound(_pos:Vector2) -> bool:
+	var _in_bound := false
+	if _pos.x < 0 or _pos.x > Game.level_size.x or _pos.y < 0 or _pos.y > Game.level_size.y:
+		_in_bound = true
+	return _in_bound
+
+
 func get_member_by_pos(_pos:Vector2) -> Unit:
 	if members.is_empty(): return
 	

@@ -1,6 +1,6 @@
 [gd_resource type="TileSet" load_steps=3 format=3 uid="uid://cywpxt7comtpf"]
 
-[ext_resource type="Texture2D" uid="uid://4r217arxkelc" path="res://assets/tiles/DungeonSheet.png" id="1_kstom"]
+[ext_resource type="Texture2D" uid="uid://bdgxhy3rk02ab" path="res://assets/tiles/DungeonSheet.png" id="1_kstom"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1k2b8"]
 resource_name = "dungeon"
@@ -30,6 +30,15 @@ texture_region_size = Vector2i(32, 32)
 3:1/0 = 0
 3:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 3:1/0/physics_layer_0/angular_velocity = 0.0
+0:2/0 = 0
+0:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+0:2/0/physics_layer_0/angular_velocity = 0.0
+1:2/0 = 0
+1:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+1:2/0/physics_layer_0/angular_velocity = 0.0
+2:2/0 = 0
+2:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+2:2/0/physics_layer_0/angular_velocity = 0.0
 
 [resource]
 tile_size = Vector2i(32, 32)

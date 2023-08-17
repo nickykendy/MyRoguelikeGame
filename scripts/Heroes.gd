@@ -46,7 +46,7 @@ func _unhandled_input(event):
 func heroes_act(dx:int, dy:int) -> void:
 	var tile_map :TileMap = get_parent().get_node("TileMap")
 	if tile_map == null: return
-	var world :Node2D = get_parent()
+	var world = get_parent()
 	if world == null: return
 	
 	var _x := current_tile.x + dx
@@ -55,6 +55,7 @@ func heroes_act(dx:int, dy:int) -> void:
 	var dest := Vector2i(_x, _y)
 	var tile := tile_map.get_cell_atlas_coords(0, dest)
 	var is_open_door := false
+	var is_wait_range_hit := false
 	
 	# 尝试移动时，遇敌发起攻击
 	if tile == Game.TILE_FLOOR:
@@ -91,7 +92,9 @@ func heroes_act(dx:int, dy:int) -> void:
 					for i in members.size():
 						if members[i].has_node("range"):
 							var range_node = members[i].get_node("range")
-							range_node.cast_skill(mon)
+							var _arrow = range_node.cast_skill(mon)
+							_arrow.hit_target.connect(_on_arrow_hit_target)
+							is_wait_range_hit = true
 		
 		if !blocked:
 			current_tile = dest
@@ -102,24 +105,25 @@ func heroes_act(dx:int, dy:int) -> void:
 	
 	try_act.emit(dest, is_open_door)
 	position = current_tile * Game.TILESIZE
-	acted.emit()
+	
+	if !is_wait_range_hit:
+		acted.emit()
 	
 	is_hero_turn = false
 
 
 func _process(_delta):
-	if Input.is_action_pressed("mouse left"):
+	var mouse_pos = get_global_mouse_position()
+	if Input.is_action_pressed("mouse right"):
 		if !picked:
-			var mouse_pos = get_global_mouse_position()
 			var _hero = get_member_by_pos(mouse_pos)
 			if _hero:
 				picked = _hero
 				var tween = create_tween()
 				tween.tween_property(_hero, "scale", Vector2(1.2, 1.2), 0.1)
 		
-	elif Input.is_action_just_released("mouse left"):
+	elif Input.is_action_just_released("mouse right"):
 		if picked:
-			var mouse_pos = get_global_mouse_position()
 			var _hero = get_member_by_pos(mouse_pos)
 			var tween = create_tween()
 			
@@ -148,3 +152,7 @@ func _on_Unit_mou_entered(_unit):
 
 func _on_Unit_mou_exited(_unit):
 	super._on_Unit_mou_exited(_unit)
+
+
+func _on_arrow_hit_target(_arrow:Ammo):
+	acted.emit()

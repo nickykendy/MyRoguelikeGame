@@ -12,22 +12,11 @@ var map :Dictionary = {}
 var fov_map :MRPAS
 var battle_log :String
 var acted_monster_num := 0
+var path_cache :Array
 
 
 func _ready():
 	_generate_map()
-	
-	astar = AStarGrid2D.new()
-	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
-	astar.region = Rect2i(0, 0, Game.level_size.x, Game.level_size.y)
-	astar.cell_size = Vector2(Game.TILESIZE, Game.TILESIZE)
-	astar.update()
-	for i in Game.level_size.x:
-		for j in Game.level_size.y:
-			var _pos = Vector2i(i, j)
-			var _tile = tile_map.get_cell_atlas_coords(0, _pos, false)
-			if _tile != Game.TILE_FLOOR:
-				astar.set_point_solid(_pos, true)
 	
 	monsters = get_tree().get_nodes_in_group("monsters")
 	heroes = get_tree().get_nodes_in_group("heroes")
@@ -47,6 +36,38 @@ func _ready():
 	_populate_mrpas()
 	_compute_field_of_view()
 	_update_monsters_visibility()
+
+
+func _process(_delta):
+	if heroes.is_empty(): return
+	
+	var mouse_pos = get_global_mouse_position()
+	var mouse_map_pos = pos_to_map(mouse_pos)
+	
+	if is_in_bound(mouse_map_pos):
+		var player_pos = Vector2(heroes[0].current_tile.x, heroes[0].current_tile.y)
+		var path = astar.get_id_path(player_pos, mouse_map_pos)
+		if !path.is_empty() and path.size() > 1:
+			for _point in path:
+				if _point == heroes[0].current_tile:
+					continue
+				if !path_cache.is_empty():
+					var cache_index = path_cache.find(_point)
+					if cache_index != -1:
+						path_cache.remove_at(cache_index)
+				tile_map.set_cell(2, _point, 0, Vector2i(0, 2), 0)
+			
+			if !path_cache.is_empty(): 
+				for _point in path_cache:
+					tile_map.erase_cell(2, _point)
+			
+			path_cache.clear()
+			path_cache = path.duplicate()
+			
+		if Input.is_action_just_pressed("mouse left"):
+			if !path.is_empty() and path.size() > 1:
+				var dest = path[1] - heroes[0].current_tile
+				heroes[0].heroes_act(dest.x, dest.y)
 
 
 func _on_Hero_acted() -> void:
@@ -120,13 +141,21 @@ func _on_Team_dmg_taken(attacker:Unit, victim:Unit, dmg:float) -> void:
 
 
 func _generate_map() -> void:
+	astar = AStarGrid2D.new()
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	astar.region = Rect2i(0, 0, Game.level_size.x, Game.level_size.y)
+	astar.cell_size = Vector2(Game.TILESIZE, Game.TILESIZE)
+	astar.update()
+	
 	for _x in Game.level_size.x:
 		for _y in Game.level_size.y:
-			var pos = Vector2i(_x, _y)
-			map[pos] = Cell.new()
-			var _tile = tile_map.get_cell_atlas_coords(0, pos, false)
-			if _tile == Game.TILE_DOOR or _tile == Game.TILE_WALL:
-				map[pos].is_walkable = false
+			var _pos = Vector2i(_x, _y)
+			var _tile = tile_map.get_cell_atlas_coords(0, _pos, false)
+			map[_pos] = Cell.new()
+			if _tile == Game.TILE_DOOR or _tile == Game.TILE_WALL or _tile == Game.TILE_VOID:
+				map[_pos].is_walkable = false
+			if _tile != Game.TILE_FLOOR:
+				astar.set_point_solid(_pos, true)
 
 
 func _populate_mrpas() -> void:
@@ -176,3 +205,16 @@ func update_fog(pos:Vector2i, is_in_view:bool, is_explored) -> void:
 
 func get_tile_center(tile_x:int, tile_y:int) -> Vector2:
 	return Vector2((tile_x + 0.5) * Game.TILESIZE, (tile_y + 0.5) * Game.TILESIZE)
+
+
+func pos_to_map(_pos:Vector2) -> Vector2i:
+	var _x = int(_pos.x / Game.TILESIZE)
+	var _y = int(_pos.y / Game.TILESIZE)
+	return Vector2i(_x, _y)
+
+
+func is_in_bound(_pos:Vector2) -> bool:
+	var _in_bound := false
+	if _pos.x >= 0 and _pos.x <= Game.level_size.x and _pos.y >= 0 and _pos.y <= Game.level_size.y:
+		_in_bound = true
+	return _in_bound

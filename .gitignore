@@ -8,6 +8,7 @@ cache/
 # Godot auto generated files
 *.gen.*
 *.import
+*.tmp
 .import/
 .godot/
 /gen/
